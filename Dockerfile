@@ -47,15 +47,12 @@ RUN \
 				subversion \
 				perl \
 				curl \
-                openjdk-8-jdk \
+                openjdk-11-jdk \
 				unzip \
 				cpanminus \
 				make
 
-ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk-amd64
-RUN update-alternatives --set java $(update-alternatives --list java | grep java-8)
-RUN update-alternatives --set javac $(update-alternatives --list javac | grep java-8)
-
+ENV JAVA_HOME /usr/lib/jvm/java-1.11.0-openjdk-amd64
 
 # Build NOPOL
 RUN git clone https://github.com/SpoonLabs/nopol /opt/nopol
@@ -66,6 +63,14 @@ WORKDIR /opt/nopol/test-projects
 RUN mvn test -DskipTests
 WORKDIR /opt/nopol/nopol
 RUN mvn test
+
+# Set default JAVA version to 8 for defects4j subjects
+RUN apt-get install -y --no-install-recommends openjdk-8-jdk
+RUN update-alternatives --set java $(update-alternatives --list java | grep java-8)
+RUN update-alternatives --set javac $(update-alternatives --list javac | grep java-8)
+
+# Copy hamcrest to nopol home
+RUN cp /root/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar /opt/nopol/nopol/lib/hamcrest-core-1.3.jar
 
 
 
